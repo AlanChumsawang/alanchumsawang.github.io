@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>💾 CS 499 Enhancement Narrative: Database Focus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #2e2e2e; /* Grey background */
+            color: #ffffff; /* White text */
+        }
+        h1, h2 {
+            color: #ffffff; /* White headings */
+        }
+        .content-box {
+            background-color: #01262e; /* Teal background for text */
+            border: 2px solid #008080; /* Teal border */
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px; /* Rounded corners */
+        }
+        pre {
+            background-color: #000000; /* Black background for code blocks */
+            color: #ffffff; /* White text for code blocks */
+            padding: 10px;
+            border: 2px solid #008080; /* Teal border */
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+            color: #ffffff; /* White text for code */
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 20px;
+            background-color: #99ecff; /* Light blue background */
+            color: #000000; /* Black text */
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .back-button:hover {
+            background-color: #80d4e6; /* dark blue hover */
+        }
+    </style>
+</head>
+<body>
+<a href="../index.html" class="back-button">⬅️ Home</a>
+<h1>💾 CS 499 Enhancement Narrative: Database Focus</h1>
+
+<div class="content-box">
+    <p>
+        The selected artifact is a MongoDB-backed application I built, which allows users to perform CRUD (Create, Read, Update, Delete) operations on animal shelter records. It was created in a previous course as part of a CRUD-focused project. However, I have revisited it here to make meaningful backend improvements, especially how the database is handled. The original setup worked, but the database logic was tightly coupled to the main application logic, making it hard to maintain and extend.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>🧠 Original Database Logic: Tightly Coupled</h2>
+    <p>In the original implementation, the database connection logic was embedded directly into the main application code:</p>
+    <pre>
+<code># Old: Hardcoded database connection
+client = MongoClient("mongodb://localhost:27017/")
+db = client["animal_shelter"]
+collection = db["animals"]
+</code>
+  </pre>
+    <p>
+        This approach:
+    </p>
+    <ul>
+        <li>Violated separation of concerns by mixing database logic with application logic</li>
+        <li>Made the code harder to test and maintain</li>
+        <li>Exposed sensitive configuration details in the source code</li>
+    </ul>
+</div>
+
+<div class="content-box">
+    <h2>✅ Refactored: Modular Database Connection</h2>
+    <p>To address these issues, I refactored the database logic into a dedicated <code>MongoDBConnection</code> class. This class handles all connection details and securely retrieves configuration from environment variables:</p>
+    <pre>
+<code># New: Modular database connection
+from pymongo import MongoClient
+import os
+
+class MongoDBConnection:
+    def __init__(self, host, port, db_name):
+        self.client = MongoClient(f"mongodb://{host}:{port}")
+        self.db = self.client[db_name]
+
+    def get_collection(self, collection_name):
+        return self.db[collection_name]
+</code>
+  </pre>
+    <p>
+        This refactor improved the code by:
+    </p>
+    <ul>
+        <li>Separating database logic into its own reusable class</li>
+        <li>Securing sensitive details using environment variables</li>
+        <li>Making the application more modular and testable</li>
+    </ul>
+</div>
+
+<div class="content-box">
+    <h2>🔒 Secure Configuration with Environment Variables</h2>
+    <p>Previously, database details were hardcoded, which posed a security risk. I enhanced this by using environment variables to store sensitive information:</p>
+    <pre>
+<code># Secure configuration using dotenv
+from dotenv import load_dotenv
+load_dotenv()
+
+host = os.getenv("MONGO_HOST")
+port = os.getenv("MONGO_PORT")
+db_name = os.getenv("MONGO_DB_NAME")
+</code>
+  </pre>
+    <p>
+        This approach aligns with secure coding practices and ensures sensitive information is not exposed in version control.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>📊 Result: Reliable, Scalable, and Testable</h2>
+    <p>
+        The refactored database logic is now:
+    </p>
+    <ul>
+        <li>Loosely coupled, making it easier to maintain and extend</li>
+        <li>Secure, with sensitive details stored in environment variables</li>
+        <li>Testable, as the database connection can be mocked during unit tests</li>
+    </ul>
+    <p>
+        These changes demonstrate my ability to improve backend architecture and align with industry best practices.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>🧠 What I Learned</h2>
+    <p>
+        Throughout the enhancement process, I learned how much cleaner and more testable code becomes when database logic is pulled into its class. I also identified how early validation can help catch issues at the point of input, reducing potential bugs downstream. One bigger challenge was ensuring the validation logic did not over-restrict input, especially when working with unpredictable JSON-based data. In the end, these changes helped me build a more stable application and deepened my confidence in building production-quality backend systems.
+    </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CS 499 Enhancement Narrative: Software Design & Engineering Focus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #2e2e2e;
+            color: #ffffff;
+        }
+        h1, h2 {
+            color: #ffffff;
+        }
+        .content-box {
+            background-color: #01262e;
+            border: 2px solid #008080;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        pre {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 10px;
+            border: 2px solid #008080;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: monospace;
+            color: #ffffff;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 20px;
+            background-color: #99ecff;
+            color: #000000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .back-button:hover {
+            background-color: #80d4e6;
+        }
+    </style>
+</head>
+<body>
+<a href="../index.html" class="back-button">⬅️ Home</a>
+<h1>🧱 CS 499 Enhancement Narrative: Software Design & Engineering Focus</h1>
+
+<div class="content-box">
+    <p>
+        For the software design and engineering portion of my ePortfolio, I focused on improving the structure, modularity, and maintainability of a project originally built during CS 340. The artifact, originally a single script handling all database logic and UI rendering, lacked separation of concerns, had hardcoded configuration values, and did not follow any defined module structure. My enhancements brought the code in line with modern engineering standards by introducing object-oriented design, environment-based configuration, and a directory structure that promotes scalability.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>🗂️ Modular Directory Structure</h2>
+    <p>
+        The original project existed as just two files. In the enhanced version, I introduced a professional-grade folder structure:
+    </p>
+    <pre>
+capstone-project/
+├── src/
+│   ├── AnimalShelterCRUD.py
+│   ├── AnimalShelterDAO.py
+│   └── ProjectTwoDashboard.py
+├── config/
+│   └── .env
+├── assets/
+├── data/
+├── old-code/
+    </pre>
+    <p>
+        This separates the backend logic (CRUD and DAO layers), the dashboard (Dash UI), and externalized configs, supporting better code reuse and maintenance.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>💡 Before: CRUD Logic Hardcoded in Dashboard</h2>
+    <p>Originally, database operations were embedded inside the dashboard logic:</p>
+    <pre>
+<code># Old (inside dashboard)
+client = MongoClient("mongodb://localhost:27017/")
+db = client["animal_shelter"]
+result = db.animals.find({})
+    </code>
+    </pre>
+    <p>
+        This tightly coupled the application layers, made testing difficult, and exposed the connection logic directly in the UI.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>✅ After: Encapsulated with Object-Oriented CRUD Class</h2>
+    <p>I rewrote this using a dedicated <code>AnimalShelterCRUD</code> class in <code>AnimalShelterCRUD.py</code>:</p>
+    <pre>
+<code># AnimalShelterCRUD.py
+class AnimalShelterCRUD:
+    def __init__(self, db_connection, collection_name="animals"):
+        self.collection = db_connection.get_database()[collection_name]
+
+    def read(self, query={}, limit=100):
+        return list(self.collection.find(query).limit(limit))
+
+    def create(self, document):
+        return self.collection.insert_one(document)
+</code>
+    </pre>
+    <p>
+        This class abstracts all database logic and safely limits queries. It's easily testable and reusable across multiple interfaces.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>🔐 Secure Configuration via Environment Variables</h2>
+    <p>Previously, database details were hardcoded, like this:</p>
+    <pre>
+<code># Old
+client = MongoClient("mongodb://localhost:27017/")
+</code>
+    </pre>
+    <p>I enhanced this by using dotenv for configuration:</p>
+    <pre>
+<code># MongoDBConnection.py
+from dotenv import load_dotenv
+load_dotenv()
+uri = os.getenv("MONGO_URI")
+db = os.getenv("MONGO_DB_NAME")
+</code>
+    </pre>
+    <p>
+        This aligns with secure coding practices and keeps sensitive info out of version control.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>📊 Result: Loosely Coupled, Testable, and Scalable</h2>
+    <p>
+        Each file now has a focused responsibility:
+    </p>
+    <ul>
+        <li><code>AnimalShelterCRUD.py</code>: Handles create/read/update/delete</li>
+        <li><code>AnimalShelterDAO.py</code>: Acts as an interface between the UI and the database</li>
+        <li><code>ProjectTwoDashboard.py</code>: Solely manages Dash app layout and callbacks</li>
+    </ul>
+    <p>
+        The result is a clean separation of concerns that makes future expansion (e.g., switching to PostgreSQL or adding unit tests) straightforward.
+    </p>
+</div>
+
+<div class="content-box">
+    <h2>🧠 What I Learned</h2>
+    <p>
+        Refactoring this code helped reinforce the importance of modularity and abstraction. I realized how coupling can sneak into small projects and scale poorly if not addressed early. The experience also improved my confidence in writing production-quality Python and aligning code structure with industry best practices like SOLID principles.
+    </p>
+</div>
+</body>
+</html>

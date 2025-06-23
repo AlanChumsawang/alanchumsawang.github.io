@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🧮 CS 499 Enhancement Narrative: Algorithms & Data Structures Focus</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+      line-height: 1.6;
+      background-color: #2e2e2e;
+      color: #ffffff;
+    }
+    h1, h2 {
+      color: #ffffff;
+    }
+    .content-box {
+      background-color: #01262e;
+      border: 2px solid #008080;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    pre {
+      background-color: #000000;
+      color: #ffffff;
+      padding: 10px;
+      border: 2px solid #008080;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: monospace;
+      color: #ffffff;
+    }
+    .back-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      padding: 10px 20px;
+      background-color: #99ecff;
+      color: #000000;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .back-button:hover {
+      background-color: #80d4e6;
+    }
+  </style>
+</head>
+<body>
+<a href="../index.html" class="back-button">⬅️ Home</a>
+<h1>🧮 CS 499 Enhancement Narrative: Algorithms & Data Structures Focus</h1>
+
+<div class="content-box">
+  <p>
+    For the algorithms and data structures portion of my ePortfolio, I focused on refining the decision logic and data handling operations inside a legacy Dash dashboard originally built during CS 340. The original artifact relied on verbose conditional checks and repetitive hardcoded filters for handling large volumes of animal shelter data. My enhancements were centered on improving the efficiency, reusability, and clarity of this logic by introducing pattern-based filtering, optimized pandas operations, and structured control flow.
+  </p>
+</div>
+
+<div class="content-box">
+  <h2>🧠 Original Logic: Repetitive Conditional Checks</h2>
+  <p>In the legacy code, filtering animals by type (e.g., Water Rescue) was handled by manually checking substrings:</p>
+  <pre>
+<code># Old: Hardcoded breed match logic
+if "lab" in breed.lower() or "chesa" in breed.lower() or "newf" in breed.lower():
+    water_rescue_animals.append(animal)
+</code>
+    </pre>
+  <p>
+    This approach:
+  </p>
+  <ul>
+    <li>Repeated logic for each category</li>
+    <li>Didn’t scale for adding or removing breeds</li>
+    <li>Was not reusable outside of the immediate conditional</li>
+  </ul>
+</div>
+
+<div class="content-box">
+  <h2>✅ Refactored: Pattern-Based Filtering with Regex</h2>
+  <p>To improve this, I replaced these repetitive checks with compiled regular expressions that match known breed types efficiently:</p>
+  <pre>
+<code># New: Regex filtering for Water Rescue
+import re
+
+water_rescue_breeds = re.compile(r"(lab|chesa|newf)", re.IGNORECASE)
+
+query = {
+    "breed": {"$regex": water_rescue_breeds},
+    "sex_upon_outcome": "Intact Female",
+    "age_upon_outcome_in_weeks": {"$gte": 26.0, "$lte": 156.0}
+}
+df = pd.DataFrame.from_records(db.read(query))
+</code>
+    </pre>
+  <p>
+    This reduced the code footprint and made it easier to maintain breed classifications across categories like Water, Mountain, and Disaster rescue types.
+  </p>
+</div>
+
+<div class="content-box">
+  <h2>🗃️ Data Structures: Using Pandas for Efficient Aggregation</h2>
+  <p>In the legacy implementation, breed frequency was not handled efficiently, and edge cases were not considered. I replaced manual counting with pandas’ built-in aggregation features:</p>
+  <pre>
+<code># New: Efficient top-breed aggregation
+breed_counts = df['breed'].value_counts()
+top_breeds = breed_counts.head(10)
+other = breed_counts.iloc[10:].sum()
+
+chart_data = pd.concat([top_breeds, pd.Series({'Other': other})]).reset_index()
+chart_data.columns = ['breed', 'count']
+</code>
+    </pre>
+  <p>
+    This logic is both memory-efficient and flexible, allowing the chart to dynamically adapt to different data views (e.g., filtered results, new uploads, etc.).
+  </p>
+</div>
+
+<div class="content-box">
+  <h2>🔄 Enhanced Conditional Logic with apply() and groupby()</h2>
+  <p>
+    Beyond filtering, I used DataFrame.apply() and groupby() methods to perform inline transformations where conditional iteration was previously used. These structures eliminated nested loops and leveraged vectorized operations for faster rendering and easier debugging.
+  </p>
+</div>
+
+<div class="content-box">
+  <h2>📊 Result: Efficient, Maintainable, and Scalable Logic</h2>
+  <p>
+    The enhanced logic now performs faster, reads more clearly, and can scale to new conditions and categories without redundant code. I centralized breed-category mappings and reused them across multiple filters. These changes reflect my understanding of core data structure principles — specifically, replacing repetitive lists and conditions with optimized search patterns and mappings.
+  </p>
+</div>
+
+<div class="content-box">
+  <h2>🧠 What I Learned</h2>
+  <p>
+    This enhancement taught me that algorithmic thinking doesn’t always show up as textbook algorithms — sometimes it’s in how we structure logic, process records, or reduce complexity in everyday data flows. I practiced balancing readability and performance, and I now approach filtering, mapping, and data transformations with a stronger sense of how structure and strategy work together.
+  </p>
+</div>
+</body>
+</html>
